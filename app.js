@@ -27,38 +27,58 @@ app.set('view engine', 'jade');
 app.use(logger('dev')); // to log activities in the console
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser('tt142857')); //supplied secret key to sign cookies from the sorver in the parameter
 
 function auth(req, res, next) {
+  console.log(req.signedCookies);
   console.log(req.headers);
-  let authHeader = req.headers.authorization;
 
-  if (!authHeader) {
-    let err = new Error('You are not authenticated');
-    res.setHeader('WWW-Authenticate', 'Basic');
-    err.status = 401;
-    return next(err);
-  }
-  else {
-    let authDecode = new Buffer(authHeader.split(' ')[1], 'base64').toString();
+  if (!req.signedCookies.user) {
 
-    console.log(authDecode);
+    let authHeader = req.headers.authorization;
 
-    let auth = authDecode.split(':');
-
-    let username = auth[0];
-    let password = auth[1];
-
-    if (username === 'admin' && password === 'password') {
-      return next();
-    }
-    else {
-      let err = new Error('wrong username or password');
+    if (!authHeader) {
+      let err = new Error('You are not authenticated');
       res.setHeader('WWW-Authenticate', 'Basic');
       err.status = 401;
-      return next(err);
+      next(err);
+      return;
     }
+    else {
+      let authDecode = new Buffer.from(authHeader.split(' ')[1], 'base64').toString();
 
+      console.log(authDecode);
+
+      let auth = authDecode.split(':');
+
+      let username = auth[0];
+      let password = auth[1];
+
+      if (username === 'admin' && password === 'password') {
+        res.cookie('user', 'admin', { signed: true }); //setting a signed cookie user: admin
+        next();
+        return;
+      }
+      else {
+        let err = new Error('wrong username or password');
+        res.setHeader('WWW-Authenticate', 'Basic');
+        err.status = 401;
+        next(err);
+        return;
+      }
+    }
+  }
+  else {
+    if (req.signedCookies.user === 'admin') {
+      next();
+      return;
+    }
+    else {
+      let err = new Error('You are not authenticated');
+      err.status = 401;
+      next(err);
+      return;
+    }
   }
 }
 
