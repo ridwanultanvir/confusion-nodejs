@@ -14,9 +14,9 @@ connection.then((db) => {
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-const dishRouter = require('./routes/dishRouter');
-const leaderRouter = require('./routes/leaderRouter');
-const promoRouter = require('./routes/promoRouter');
+var dishRouter = require('./routes/dishRouter');
+var leaderRouter = require('./routes/leaderRouter');
+var promoRouter = require('./routes/promoRouter');
 
 var app = express();
 
@@ -28,6 +28,42 @@ app.use(logger('dev')); // to log activities in the console
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+function auth(req, res, next) {
+  console.log(req.headers);
+  let authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    let err = new Error('You are not authenticated');
+    res.setHeader('WWW-Authenticate', 'Basic');
+    err.status = 401;
+    return next(err);
+  }
+  else {
+    let authDecode = new Buffer(authHeader.split(' ')[1], 'base64').toString();
+
+    console.log(authDecode);
+
+    let auth = authDecode.split(':');
+
+    let username = auth[0];
+    let password = auth[1];
+
+    if (username === 'admin' && password === 'password') {
+      return next();
+    }
+    else {
+      let err = new Error('wrong username or password');
+      res.setHeader('WWW-Authenticate', 'Basic');
+      err.status = 401;
+      return next(err);
+    }
+
+  }
+}
+
+app.use(auth);
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
