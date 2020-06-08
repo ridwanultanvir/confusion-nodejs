@@ -3,6 +3,8 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var session = require('express-session');
+var FileStore = require('session-file-store')(session);
 
 const mongoose = require('mongoose');
 const url = 'mongodb://localhost:27017/confusion';
@@ -27,13 +29,19 @@ app.set('view engine', 'jade');
 app.use(logger('dev')); // to log activities in the console
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser('tt142857')); //supplied secret key to sign cookies from the sorver in the parameter
+app.use(session({
+  name: 'session-id',
+  secret: 'tt142857',
+  saveUninitialized: false,
+  resave: false,
+  store: new FileStore()
+}));
 
 function auth(req, res, next) {
-  console.log(req.signedCookies);
+  console.log(req.session);
   console.log(req.headers);
 
-  if (!req.signedCookies.user) {
+  if (!req.session.user) {
 
     let authHeader = req.headers.authorization;
 
@@ -55,7 +63,7 @@ function auth(req, res, next) {
       let password = auth[1];
 
       if (username === 'admin' && password === 'password') {
-        res.cookie('user', 'admin', { signed: true }); //setting a signed cookie user: admin
+        req.session.user = 'admin'
         next();
         return;
       }
@@ -69,7 +77,7 @@ function auth(req, res, next) {
     }
   }
   else {
-    if (req.signedCookies.user === 'admin') {
+    if (req.session.user === 'admin') {
       next();
       return;
     }
