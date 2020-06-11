@@ -8,9 +8,10 @@ var FileStore = require('session-file-store')(session);
 const mongoose = require('mongoose');
 const passport = require('passport');
 const authenticate = require('./authenticate');
+const config = require('./config');
 
 
-const url = 'mongodb://localhost:27017/confusion';
+const url = config.mongoUrl;
 const connection = mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
 
 connection.then((db) => {
@@ -23,6 +24,8 @@ var dishRouter = require('./routes/dishRouter');
 var leaderRouter = require('./routes/leaderRouter');
 var promoRouter = require('./routes/promoRouter');
 
+//console.log('inside app.js 1 ')
+
 var app = express();
 
 // view engine setup
@@ -33,35 +36,39 @@ app.use(logger('dev')); // to log activities in the console
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use(session({
-  name: 'session-id',
-  secret: 'tt142857',
-  saveUninitialized: false,
-  resave: false,
-  store: new FileStore()
-}));
+//console.log('inside app.js 2 ')
+
+// app.use(session({
+//   name: 'session-id',
+//   secret: 'tt142857',
+//   saveUninitialized: false,
+//   resave: false,
+//   store: new FileStore()
+// }));
 
 
 app.use(passport.initialize());
-app.use(passport.session());
+//app.use(passport.session());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
-function auth(req, res, next) {
-  console.log(req.session);
+//console.log('inside app.js 3 ')
 
-  if (!req.user) {
-    var err = new Error('You are not authenticated!');
-    err.status = 403;
-    return next(err);
-  }
-  else {
-    next();
-  }
-}
+// function auth(req, res, next) {
+//   console.log(req.session);
 
-app.use(auth);
+//   if (!req.user) {
+//     var err = new Error('You are not authenticated!');
+//     err.status = 403;
+//     return next(err);
+//   }
+//   else {
+//     next();
+//   }
+// }
+
+// app.use(auth);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -70,6 +77,7 @@ app.use('/dishes', dishRouter);
 app.use('/promotions', promoRouter);
 app.use('/leaders', leaderRouter);
 
+//console.log('inside app.js 4 ')
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -88,3 +96,5 @@ app.use(function (err, req, res, next) {
 });
 
 module.exports = app;
+
+//console.log('inside app.js 5')

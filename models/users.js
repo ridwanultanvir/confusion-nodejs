@@ -11,7 +11,7 @@ const userSchema = new Schema(
     }
 );
 
-userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(passportLocalMongoose); //adds username and hashed password in the userSchema 
 
 const user = mongoose.model('user', userSchema);
 
