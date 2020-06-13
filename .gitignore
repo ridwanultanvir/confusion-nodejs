@@ -3,3 +3,4 @@ db.json
 sessions/
 bin/private.key
 bin/certificate.cert
+public/images
