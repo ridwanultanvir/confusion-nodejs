@@ -15,6 +15,10 @@ const userSchema = new Schema(
         lastname: {
             type: String,
             default: ''
+        },
+        facebookId: {
+            type: String,
+            default: ''
         }
     }
 );
