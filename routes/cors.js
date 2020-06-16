@@ -23,5 +23,5 @@ var corsOptionsDelegate = (req, callback) => {
     callback(null, corsOption);
 }
 
-module.exports.cors = cors(); // specifies all requests from diffrent origins are acceptable
+module.exports.cors = cors(); // indicates that all requests from diffrent origins are acceptable
 module.exports.corsWithOption = cors(corsOptionsDelegate) // only the whitelisted origins are acceptable

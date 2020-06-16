@@ -24,6 +24,7 @@ var dishRouter = require('./routes/dishRouter');
 var leaderRouter = require('./routes/leaderRouter');
 var promoRouter = require('./routes/promoRouter');
 var uploadRouter = require('./routes/uploadRouter');
+var favouritesRouter = require('./routes/favouriteRouter');
 
 //console.log('inside app.js 1 ')
 
@@ -91,6 +92,7 @@ app.use('/dishes', dishRouter);
 app.use('/promotions', promoRouter);
 app.use('/leaders', leaderRouter);
 app.use('/imageUpload', uploadRouter);
+app.use('/favourite', favouritesRouter);
 
 //console.log('inside app.js 4 ')
 
