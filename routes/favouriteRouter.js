@@ -15,15 +15,6 @@ favouriteRouter.route('/')
             .populate('dishes.dish')
             .populate('user')
             .then((dishes) => {
-                //console.log(dishes._id);
-                // favourites.findById(dishes._id)  //doesn't populate the author in comments
-                //     .populate('dish.comments.author')
-                //     .then((dishes) => {
-                //         res.statusCode = 200;
-                //         res.setHeader('Content-type', 'application/json');
-                //         res.json(dishes)
-                //     }, (err) => next(err))
-                //     .catch((err) => next(err));
                 res.statusCode = 200;
                 res.setHeader('Content-type', 'application/json');
                 res.json(dishes);
@@ -60,7 +51,7 @@ favouriteRouter.route('/')
                     favourites.create({ user: req.user._id })
                         .then((user) => {
                             let favouriteDishes = req.body;
-                            console.log(favouriteDishes);
+
                             for (let i = 0; i < favouriteDishes.length; i++) {
                                 user.dishes.push({ dish: favouriteDishes[i] });
                             }
@@ -101,18 +92,17 @@ favouriteRouter.route('/:dishId')
         res.end("PUT operation not supported on favourites/" + req.params.dishId);
     })
     .post(authenticate.verifyUser, (req, res, next) => { //correct
-        console.log('1');
+
         favourites.findOne({ user: req.user._id })
             .then((user) => {
                 if (user !== null) {
-                    console.log('2');
-                    console.log(user);
+
 
                     let dishesLength = user.dishes.length;
                     let present = false;
 
                     for (let i = 0; i < dishesLength; i++) {
-                        //console.log(user.dishes[i]._id);
+
                         if (user.dishes[i].dish._id == req.params.dishId) {
                             present = true;
                             break;
@@ -120,13 +110,11 @@ favouriteRouter.route('/:dishId')
                     }
 
                     if (!present) { //correct
-                        console.log('5');
-                        console.log(user);
+
                         user.dishes.push({ dish: req.params.dishId });
                         user.save()
                             .then((user) => {
-                                console.log('after 5 ');
-                                console.log(user)
+
                                 favourites.findById(user._id)
                                     .populate('user')
                                     .populate('dishes.dish')
@@ -139,7 +127,7 @@ favouriteRouter.route('/:dishId')
                             .catch((err) => next(err));
                     }
                     else { //correct
-                        console.log('3');
+
                         res.statusCode = 200;
                         res.setHeader('Content-type', 'application/json');
                         res.end('Dish is already in the favourites list');
@@ -148,18 +136,16 @@ favouriteRouter.route('/:dishId')
                 else { //correct
                     favourites.create({ user: req.user._id })
                         .then((user) => {
-                            console.log(user);
+
                             user.dishes.push({ dish: req.params.dishId });
                             user.save()
                                 .then((user) => {
-                                    console.log("ulala ualala");
-                                    console.log(user);
+
                                     favourites.findById(user._id)
                                         .populate('dishes.dish')
                                         .populate('user')
                                         .then((user) => {
-                                            console.log("mairala mairala");
-                                            console.log(user);
+
                                             res.statusCode = 200;
                                             res.setHeader('Content-type', 'application/json');
                                             res.json(user);
@@ -171,15 +157,14 @@ favouriteRouter.route('/:dishId')
                 }
             }, (err) => next(err))
             .catch((err) => {
-                console.log('4');
+
                 return next(err)
             });
     })
     .delete(authenticate.verifyUser, (req, res, next) => { //correct
         favourites.findOne({ user: req.user._id })
             .then((user) => {
-                console.log('1');
-                console.log(user);
+
 
                 let len = user.dishes.length;
 
@@ -192,14 +177,12 @@ favouriteRouter.route('/:dishId')
 
                 user.save()
                     .then((user) => {
-                        console.log('2');
-                        console.log(user);
+
                         favourites.findById(user._id)
                             .populate('dishes.dish')
                             .populate('user')
                             .then((user) => {
-                                console.log("mairala mairala");
-                                console.log(user);
+
                                 res.statusCode = 200;
                                 res.setHeader('Content-type', 'application/json');
                                 res.json(user);
@@ -209,49 +192,6 @@ favouriteRouter.route('/:dishId')
                     .catch((err) => next(err));
             }, (err) => next(err))
             .catch((err) => next(err));
-    })
-
-
-// .delete(authenticate.verifyUser, (req, res, next) => {
-//     favourites.findOne({ user: req.user._id })
-//         .then((user) => {
-//             console.log('1');
-//             console.log(user);
-//             let dishIndex = user.dishes.indexOf(req.params.dishId);
-
-//             let present = false;
-//             let len = user.dishes.length;
-
-//             for (let i = 0; i < len; i++){
-//                 if (user.dishes[i].dish == req.params.dishId) {
-//                     user.dishes[i].remove();
-//                     break;
-//                 }
-//             }
-
-
-//             console.log(dishIndex);
-//             if (dishIndex !== -1) {
-//                 console.log('2');
-//                 user.dishes.id(user.dishes[dishIndex]._id).remove();
-//                 user.save()
-//                     .then((user) => {
-//                         console.log('3');
-//                         favourites.findOne(user._id)
-//                             .populate('user')
-//                             .populate('dishes.dish')
-//                             .then((user) => {
-//                                 console.log('4');
-//                                 res.statusCode = 200;
-//                                 res.setHeader('Content-Type', 'application/json');
-//                                 res.json(user);
-//                             }, (err) => next(err))
-//                             .catch((err) => next(err));
-//                     }, (err) => next(err))
-//                     .catch((err) => next(err));
-//             }
-//         }, (err) => next(err))
-//         .catch((err) => next(err));
-// })
+    });
 
 module.exports = favouriteRouter;
