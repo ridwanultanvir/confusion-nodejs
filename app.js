@@ -25,6 +25,7 @@ var leaderRouter = require('./routes/leaderRouter');
 var promoRouter = require('./routes/promoRouter');
 var uploadRouter = require('./routes/uploadRouter');
 var favouritesRouter = require('./routes/favouriteRouter');
+var commentRouter = require('./routes/commentRouter');
 
 //console.log('inside app.js 1 ')
 
@@ -93,6 +94,7 @@ app.use('/promotions', promoRouter);
 app.use('/leaders', leaderRouter);
 app.use('/imageUpload', uploadRouter);
 app.use('/favourite', favouritesRouter);
+app.use('/comments', commentRouter);
 
 //console.log('inside app.js 4 ')
 

@@ -84,8 +84,28 @@ favouriteRouter.route('/')
 
 favouriteRouter.route('/:dishId')
     .get(authenticate.verifyUser, (req, res, next) => {
-        res.statusCode = 403;
-        res.end("GET operation not supported on favourites/" + req.params.dishId);
+        favourites.findOne({ user: req.user._id })
+            .then((favorites) => {
+                if (!favorites) {
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    return res.json({ "exists": false, "favorites": favorites });
+                }
+                else {
+                    if (favorites.dishes.indexOf(req.params.dishId) < 0) {
+                        res.statusCode = 200;
+                        res.setHeader('Content-Type', 'application/json');
+                        return res.json({ "exists": false, "favorites": favorites });
+                    }
+                    else {
+                        res.statusCode = 200;
+                        res.setHeader('Content-Type', 'application/json');
+                        return res.json({ "exists": true, "favorites": favorites });
+                    }
+                }
+
+            }, (err) => next(err))
+            .catch((err) => next(err))
     })
     .put(authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
